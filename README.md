@@ -1,7 +1,9 @@
 # EconoGuide Frontend
 
 A React-based frontend for the 'EconoGuide' (Economic Literacy Assessment application).
-For [Hackonomics 2025](https://hackonomics25.devpost.com/) hackathon project EconoGuide.
+For [Hackonomics 2025](https://hackonomics25.devpost.com/) hackathon project EconoGuide.  
+Project for backend - https://github.com/nbabii/EconoGuide-be
+
 
 ## Features
 
