@@ -17,13 +17,15 @@ function Quiz({ onComplete, onRestart }) {
   const [loading, setLoading] = useState(true);
   const [selectedAnswer, setSelectedAnswer] = useState('');
 
+  const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
+
   useEffect(() => {
     fetchQuestions();
   }, []);
 
   const fetchQuestions = async () => {
     try {
-      const response = await fetch('http://localhost:8000/generate-questions');
+      const response = await fetch(`${API_URL}/generate-questions`);
       const data = await response.json();
       setQuestions(JSON.parse(data.questions));
       setLoading(false);
@@ -54,7 +56,7 @@ function Quiz({ onComplete, onRestart }) {
 
   const submitQuiz = async (finalAnswers) => {
     try {
-      const response = await fetch('http://localhost:8000/submit-quiz', {
+      const response = await fetch(`${API_URL}/submit-quiz`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -101,9 +103,9 @@ function Quiz({ onComplete, onRestart }) {
         value={selectedAnswer}
         onChange={(e) => handleAnswer(e.target.value)}
       >
-        {question.answers.map((answer, index) => (
+        {question.answers.map((answer) => (
           <FormControlLabel
-            key={index}
+            key={answer}
             value={answer}
             control={<Radio />}
             label={answer}
