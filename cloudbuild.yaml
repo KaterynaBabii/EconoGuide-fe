@@ -1,0 +1,36 @@
+steps:
+  - name: 'gcr.io/cloud-builders/docker'
+    args: 
+      - 'build'
+      - '-t'
+      - 'gcr.io/$PROJECT_ID/econoguide-frontend'
+      - '--build-arg'
+      - 'REACT_APP_GCP_PROJECT_ID=$PROJECT_ID'
+      - '--build-arg'
+      - 'REACT_APP_API_URL=${_API_URL}'
+      - '--build-arg'
+      - 'REACT_APP_ENVIRONMENT=production'
+      - '.'
+
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'gcr.io/$PROJECT_ID/econoguide-frontend']
+
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: gcloud
+    args:
+      - 'run'
+      - 'deploy'
+      - 'econoguide-frontend'
+      - '--image'
+      - 'gcr.io/$PROJECT_ID/econoguide-frontend'
+      - '--region'
+      - 'us-central1'
+      - '--platform'
+      - 'managed'
+      - '--allow-unauthenticated'
+
+images:
+  - 'gcr.io/$PROJECT_ID/econoguide-frontend'
+
+substitutions:
+  _API_URL: 'https://your-backend-url' 
