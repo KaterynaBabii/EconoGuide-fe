@@ -16,6 +16,7 @@ function Quiz({ onComplete, onRestart }) {
   const [answers, setAnswers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedAnswer, setSelectedAnswer] = useState('');
+  const [error, setError] = useState(null);
 
   const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
 
@@ -26,21 +27,37 @@ function Quiz({ onComplete, onRestart }) {
   const fetchQuestions = async () => {
     try {
       const response = await fetch(`${API_URL}/generate-questions`);
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.detail || 'Failed to fetch questions');
+      }
       const data = await response.json();
-      setQuestions(JSON.parse(data.questions));
+      
+      // Validate response data
+      if (!data.questions || !Array.isArray(data.questions) || data.questions.length === 0) {
+        throw new Error('Invalid questions format received from server');
+      }
+      
+      setQuestions(data.questions);
       setLoading(false);
+      setError(null);
     } catch (error) {
       console.error('Error fetching questions:', error);
       setLoading(false);
+      setError(error.message || 'Failed to load questions. Please try again.');
     }
   };
 
   const handleAnswer = (answer) => {
+    if (!questions[currentQuestion]) return;
+    
     setSelectedAnswer(answer);
     const newAnswers = [...answers];
     newAnswers[currentQuestion] = {
       question_id: currentQuestion + 1,
-      answer: answer
+      question: questions[currentQuestion].question,
+      selected_answer: answer,
+      all_answers: questions[currentQuestion].answers
     };
     setAnswers(newAnswers);
   };
@@ -48,7 +65,7 @@ function Quiz({ onComplete, onRestart }) {
   const handleNext = () => {
     if (currentQuestion < questions.length - 1) {
       setCurrentQuestion(currentQuestion + 1);
-      setSelectedAnswer(answers[currentQuestion + 1]?.answer || '');
+      setSelectedAnswer(answers[currentQuestion + 1]?.selected_answer || '');
     } else {
       submitQuiz(answers);
     }
@@ -63,10 +80,17 @@ function Quiz({ onComplete, onRestart }) {
         },
         body: JSON.stringify({ answers: finalAnswers }),
       });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.detail || 'Failed to submit quiz');
+      }
+      
       const results = await response.json();
       onComplete(results);
     } catch (error) {
       console.error('Error submitting quiz:', error);
+      setError(error.message || 'Failed to submit quiz. Please try again.');
     }
   };
 
@@ -78,9 +102,30 @@ function Quiz({ onComplete, onRestart }) {
     );
   }
 
-  const question = questions[currentQuestion];
-  if (!question) return null;
+  if (error) {
+    return (
+      <Box sx={{ p: 4, textAlign: 'center' }}>
+        <Typography color="error" gutterBottom>{error}</Typography>
+        <Button variant="contained" onClick={fetchQuestions}>
+          Try Again
+        </Button>
+      </Box>
+    );
+  }
 
+  // Ensure we have questions before rendering
+  if (!questions.length || !questions[currentQuestion]) {
+    return (
+      <Box sx={{ p: 4, textAlign: 'center' }}>
+        <Typography>No questions available.</Typography>
+        <Button variant="contained" onClick={fetchQuestions}>
+          Reload Questions
+        </Button>
+      </Box>
+    );
+  }
+
+  const question = questions[currentQuestion];
   const isLastQuestion = currentQuestion === questions.length - 1;
 
   return (
@@ -103,14 +148,14 @@ function Quiz({ onComplete, onRestart }) {
         value={selectedAnswer}
         onChange={(e) => handleAnswer(e.target.value)}
       >
-        {question.answers.map((answer) => (
+        {question.answers?.map((answer) => (
           <FormControlLabel
             key={answer}
             value={answer}
             control={<Radio />}
             label={answer}
           />
-        ))}
+        )) || null}
       </RadioGroup>
 
       <Box sx={{ mt: 4, display: 'flex', justifyContent: 'space-between' }}>
