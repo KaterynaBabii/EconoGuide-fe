@@ -4,11 +4,17 @@ import {
   ToggleButtonGroup,
   ToggleButton,
   Paper,
+  useMediaQuery,
+  useTheme,
 } from '@mui/material';
+
 import RecommendationView from './RecommendationView';
 import AnswerBreakdownView from './AnswerBreakdownView';
 
 function FinancialDashboard({ results }) {
+   const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+
   const [view, setView] = useState('recommendation');
 
   const handleViewChange = (event, newView) => {
@@ -41,8 +47,8 @@ function FinancialDashboard({ results }) {
           sx={{
             '& .MuiToggleButton-root': {
               border: 'none',
-              pl: 8,
-              pr: 8,
+              pl: isMobile ? 2 : 8, 
+              pr: isMobile ? 2 : 8,
               pb: 0,
               pt: 0,
               '&.Mui-selected': {

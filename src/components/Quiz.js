@@ -9,16 +9,18 @@ import {
   Radio,
   LinearProgress,
 } from '@mui/material';
+import Loading from './Loading';
 
 function Quiz({ onComplete, onRestart }) {
   const [questions, setQuestions] = useState([]);
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [answers, setAnswers] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [resultLoading, setResultLoading] = useState(false);
   const [selectedAnswer, setSelectedAnswer] = useState('');
   const [error, setError] = useState(null);
 
-  const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
+  const API_URL = "https://econoguide-backend-349130934423.us-central1.run.app/" || 'http://localhost:8000';
 
   useEffect(() => {
     fetchQuestions();
@@ -72,6 +74,7 @@ function Quiz({ onComplete, onRestart }) {
   };
 
   const submitQuiz = async (finalAnswers) => {
+    setResultLoading(true);
     try {
       const response = await fetch(`${API_URL}/submit-quiz`, {
         method: 'POST',
@@ -91,14 +94,24 @@ function Quiz({ onComplete, onRestart }) {
     } catch (error) {
       console.error('Error submitting quiz:', error);
       setError(error.message || 'Failed to submit quiz. Please try again.');
+    } finally {
+      setResultLoading(false);
     }
   };
 
   if (loading) {
     return (
-      <Box sx={{ width: '100%' }}>
-        <LinearProgress />
-      </Box>
+      <Paper elevation={3} sx={{ p: 4 }}>
+        <Loading message="Preparing your financial literacy assessment..." />
+      </Paper>
+    );
+  }
+
+  if (resultLoading) {
+    return (
+      <Paper elevation={3} sx={{ p: 4 }}>
+        <Loading message="Analyzing your answers and generating personalized recommendations..." />
+      </Paper>
     );
   }
 

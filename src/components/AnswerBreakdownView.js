@@ -25,7 +25,7 @@ function AnswerBreakdownView({ results }) {
       </Box>
       <Divider color="black" pb={2}/>
        {results.question_scores.map((score) => (
-                <Box display="flex" alignItems="start" pt={2}>
+                <Box display="flex" alignItems="start" pt={2} key={score.question_id}>
                     <Box flex={1} p={1}>
                     <Typography fontSize={18}>{score.question_id}: {score.question}</Typography>
                     </Box>

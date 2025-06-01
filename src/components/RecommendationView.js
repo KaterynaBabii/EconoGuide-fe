@@ -111,7 +111,7 @@ function RecommendationView({ results }) {
   );
 
   if (!results?.targeted_recommendations) return null;
-  console.log('results', results)
+
   return (
     <Box sx={{ display: 'flex', gap: 3, position: 'relative', scrollBehavior: 'smooth' }}>
       {isMobile && (

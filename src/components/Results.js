@@ -11,8 +11,8 @@ import FinancialDashboard from './FinancialDashboard';
 function Results({ results, onRestart }) {
   if (!results) return null;
 
-  const { question_scores, overall_assessment, targeted_recommendations } = results;
-  console.log('targeted_recommendations', targeted_recommendations)
+  const { question_scores, overall_assessment } = results;
+
   return (
     <Box>
       <Paper elevation={3} sx={{ p: 4, mb: 4 }}>
