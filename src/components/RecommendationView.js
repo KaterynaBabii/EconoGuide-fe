@@ -129,7 +129,7 @@ function RecommendationView({ results }) {
         </Box>
       )}
       {isMobile && renderSidebar()}
-      <Box sx={{ flex: 1 }}>
+      <Box sx={{ flex: 1, width: '100%' }}>
         {results.targeted_recommendations.map((recommendation) => {
           const categoryId = recommendation.area.toLowerCase().replace(/\s+/g, '-');
 
@@ -162,7 +162,7 @@ function RecommendationView({ results }) {
                       <List>
                         {recommendation.improvement_plan.immediate_actions.map((action, idx) => (
                           <ListItem key={`${categoryId}-action-${idx}`}>
-                            <ListItemText primary={action} />
+                            <ListItemText primary={action} sx={{ textOverflow: 'ellipsis', overflow: 'hidden' }}/>
                           </ListItem>
                         ))}
                       </List>

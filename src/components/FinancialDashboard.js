@@ -63,10 +63,10 @@ function FinancialDashboard({ results }) {
             },
           }}
         >
-          <ToggleButton value="breakdown" sx={{ textTransform: 'none', fontSize: 16 }}>
+          <ToggleButton value="breakdown" sx={{ textTransform: 'none', fontSize: isMobile ? 14 : 16 }}>
             Answer Breakdown
           </ToggleButton>
-          <ToggleButton value="recommendation" sx={{ textTransform: 'none', fontSize: 16 }}>
+          <ToggleButton value="recommendation" sx={{ textTransform: 'none', fontSize: isMobile ? 14 : 16 }}>
             Recommendation
           </ToggleButton>
         </ToggleButtonGroup>
