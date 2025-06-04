@@ -12,13 +12,12 @@ function ScoreChart({ score, totalPossible }) {
   ];
 
   const getGradientColors = (percent) => {
-      // return ['#EB001B', '#FCE945', '#FCE945', '#007953'];
     if (percent >= 70) {
-      return ['#4CAF50', '#FCE945', '#81C784'];
+       return ['#1976d2', '#1976d2'];
     } else if (percent >= 40) {
-      return ['#FFA726', '#FFB74D']; // Yellow/Orange gradient
+      return ['#1976d2', '#1976d2'];
     } else {
-      return ['#E57373', '#EF5350']; // Red gradient
+      return ['#1976d2', '#1976d2'];
     }
   };
 
@@ -38,15 +37,13 @@ function ScoreChart({ score, totalPossible }) {
           <defs>
             <linearGradient id="scoreGradient" x1="0" y1="0" x2="0" y2="1">
               <stop offset="0%" stopColor={colors[0]} />
-              <stop offset="50%" stopColor={colors[1]} />
-              <stop offset="100%" stopColor={colors[2]} />
             </linearGradient>
           </defs>
            <Pie
              data={data}
             cx="50%"
             cy="50%"
-            innerRadius={60}
+            innerRadius={65}
             outerRadius={80}
             startAngle={90}
             endAngle={-270}

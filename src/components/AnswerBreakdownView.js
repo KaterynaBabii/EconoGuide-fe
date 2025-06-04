@@ -11,7 +11,6 @@ function AnswerBreakdownView({ results }) {
 
   return (
     <Box display="flex" flexDirection="column">
-      {/* Row 1 */}
       <Box display="flex" alignItems="center">
         <Box flex={1} p={1}>
          <Typography variant="h6">Question</Typography>

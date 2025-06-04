@@ -50,7 +50,7 @@ function RecommendationView({ results }) {
     
     if (categoryRefs.current[categoryId]) {
       const element = categoryRefs.current[categoryId];
-      const offset = 80; // Adjust this value based on your header/navigation height
+      const offset = 80;
       const elementPosition = element.getBoundingClientRect().top + window.pageYOffset;
       
       window.scrollTo({
@@ -152,7 +152,6 @@ function RecommendationView({ results }) {
                 </Typography>
 
                 <Grid container spacing={3}>
-                  {/* Immediate Actions Section */}
                   <Grid item xs={12} md={6}>
                     <Box sx={{ height: '100%' }}>
                       <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
@@ -169,7 +168,6 @@ function RecommendationView({ results }) {
                     </Box>
                   </Grid>
 
-                  {/* Long-term Goals Section */}
                   <Grid item xs={12} md={6}>
                     <Box sx={{ height: '100%' }}>
                       <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>

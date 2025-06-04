@@ -10,6 +10,12 @@ import {
   LinearProgress,
 } from '@mui/material';
 import Loading from './Loading';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import CloseIcon from '@mui/icons-material/Close';
+
+import ScoreChart from './ScoreChart';
+import { fetchQuizQuestions, submitQuizAnswers } from '../services/api.js';
+
 
 function Quiz({ onComplete, onRestart }) {
   const [questions, setQuestions] = useState([]);
@@ -19,34 +25,22 @@ function Quiz({ onComplete, onRestart }) {
   const [resultLoading, setResultLoading] = useState(false);
   const [selectedAnswer, setSelectedAnswer] = useState('');
   const [error, setError] = useState(null);
-
-  const API_URL = "https://econoguide-backend-349130934423.us-central1.run.app/" || 'http://localhost:8000';
+  const [quizResults, setQuizResults] = useState(null);
 
   useEffect(() => {
-    fetchQuestions();
+    loadQuestions();
   }, []);
 
-  const fetchQuestions = async () => {
+  const loadQuestions = async () => {
     try {
-      const response = await fetch(`${API_URL}/generate-questions`);
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.detail || 'Failed to fetch questions');
-      }
-      const data = await response.json();
-      
-      // Validate response data
-      if (!data.questions || !Array.isArray(data.questions) || data.questions.length === 0) {
-        throw new Error('Invalid questions format received from server');
-      }
-      
-      setQuestions(data.questions);
-      setLoading(false);
+      const questions = await fetchQuizQuestions();
+      setQuestions(questions);
       setError(null);
     } catch (error) {
-      console.error('Error fetching questions:', error);
-      setLoading(false);
+      console.error('Error loading questions:', error);
       setError(error.message || 'Failed to load questions. Please try again.');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -64,32 +58,25 @@ function Quiz({ onComplete, onRestart }) {
     setAnswers(newAnswers);
   };
 
+  const handleBack = () => {
+    setCurrentQuestion(currentQuestion - 1);
+    setSelectedAnswer(answers[currentQuestion - 1]?.selected_answer || '');
+  };
+
   const handleNext = () => {
     if (currentQuestion < questions.length - 1) {
       setCurrentQuestion(currentQuestion + 1);
       setSelectedAnswer(answers[currentQuestion + 1]?.selected_answer || '');
     } else {
-      submitQuiz(answers);
+      handleQuizSubmit(answers);
     }
   };
 
-  const submitQuiz = async (finalAnswers) => {
+  const handleQuizSubmit = async (finalAnswers) => {
     setResultLoading(true);
     try {
-      const response = await fetch(`${API_URL}/submit-quiz`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ answers: finalAnswers }),
-      });
-      
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.detail || 'Failed to submit quiz');
-      }
-      
-      const results = await response.json();
+      const results = await submitQuizAnswers(finalAnswers);
+      setQuizResults(results);
       onComplete(results);
     } catch (error) {
       console.error('Error submitting quiz:', error);
@@ -101,17 +88,13 @@ function Quiz({ onComplete, onRestart }) {
 
   if (loading) {
     return (
-      <Paper elevation={3} sx={{ p: 4 }}>
         <Loading message="Preparing your financial literacy assessment..." />
-      </Paper>
     );
   }
 
   if (resultLoading) {
     return (
-      <Paper elevation={3} sx={{ p: 4 }}>
         <Loading message="Analyzing your answers and generating personalized recommendations..." />
-      </Paper>
     );
   }
 
@@ -119,19 +102,44 @@ function Quiz({ onComplete, onRestart }) {
     return (
       <Box sx={{ p: 4, textAlign: 'center' }}>
         <Typography color="error" gutterBottom>{error}</Typography>
-        <Button variant="contained" onClick={fetchQuestions}>
+        <Button variant="contained" onClick={loadQuestions}>
           Try Again
         </Button>
       </Box>
     );
   }
 
-  // Ensure we have questions before rendering
+  // if (quizResults) {
+  //   return (
+  //     <Paper elevation={3} sx={{ p: 4 }}>
+  //       <Typography variant="h4" gutterBottom align="center">
+  //         Quiz Results
+  //       </Typography>
+  //       <Box sx={{ my: 4 }}>
+  //         <ScoreChart 
+  //           score={quizResults.score || 0} 
+  //           totalPossible={questions.length} 
+  //         />
+  //       </Box>
+  //       <Box sx={{ mt: 4, display: 'flex', justifyContent: 'center' }}>
+  //         <Button
+  //           variant="contained"
+  //           color="primary"
+  //           onClick={onRestart}
+  //         >
+  //           Take Quiz Again
+  //         </Button>
+  //       </Box>
+  //     </Paper>
+  //   );
+  // }
+
+
   if (!questions.length || !questions[currentQuestion]) {
     return (
       <Box sx={{ p: 4, textAlign: 'center' }}>
         <Typography>No questions available.</Typography>
-        <Button variant="contained" onClick={fetchQuestions}>
+        <Button variant="contained" onClick={loadQuestions}>
           Reload Questions
         </Button>
       </Box>
@@ -142,52 +150,74 @@ function Quiz({ onComplete, onRestart }) {
   const isLastQuestion = currentQuestion === questions.length - 1;
 
   return (
-    <Paper elevation={3} sx={{ p: 4 }}>
-      <Box sx={{ mb: 4 }}>
-        <LinearProgress
-          variant="determinate"
-          value={(currentQuestion / questions.length) * 100}
-        />
-        <Typography variant="body2" sx={{ mt: 1 }}>
-          Question {currentQuestion + 1} of {questions.length}
+    <Paper elevation={3} sx={{ p: 4, backgroundColor: '#f5f5f5' }}>
+       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+         <Typography variant="body2" sx={{ fontSize: '1.2rem', fontWeight: 600 }}>
+             {currentQuestion + 1}/{questions.length}
         </Typography>
-      </Box>
-
-      <Typography variant="h5" gutterBottom>
-        {question.question}
-      </Typography>
-
-      <RadioGroup 
-        value={selectedAnswer}
-        onChange={(e) => handleAnswer(e.target.value)}
-      >
-        {question.answers?.map((answer) => (
-          <FormControlLabel
-            key={answer}
-            value={answer}
-            control={<Radio />}
-            label={answer}
+        <Box sx={{ width: '90%' }}>
+          <LinearProgress
+            variant="buffer"
+            value={(currentQuestion / questions.length) * 100}
+            sx={{ height: 10, borderRadius: 5 }}
           />
-        )) || null}
-      </RadioGroup>
+        </Box>
+        <CloseIcon onClick={onRestart} />
+      </Box>
+      <Box sx={{ px: 5 }}>
+        <Typography variant="h5" gutterBottom sx={{ textAlign: 'center', py: 4, fontWeight: 500 }}>
+          {question.question}
+        </Typography>
+
+        <RadioGroup 
+          value={selectedAnswer}
+          onChange={(e) => handleAnswer(e.target.value)}
+        >
+          {question.answers?.map((answer) => (
+            <FormControlLabel
+              key={answer}
+              value={answer}
+              control={<Radio />}
+              label={answer}
+              sx={{
+                backgroundColor: '#fff',
+                borderRadius: 3,
+                marginBottom: 2,
+                padding: 1,
+              }}
+            />
+          )) || null}
+        </RadioGroup>
+      </Box>
 
       <Box sx={{ mt: 4, display: 'flex', justifyContent: 'space-between' }}>
-        <Button
-          variant="outlined"
-          color="primary"
-          onClick={onRestart}
-        >
-          Back to Start
-        </Button>
-        <Button
-          variant="contained"
-          color="primary"
-          disabled={!selectedAnswer}
-          onClick={handleNext}
-        >
-          {isLastQuestion ? 'Finish' : 'Next'}
-        </Button>
-      </Box>
+          <Button
+            startIcon={<ArrowBackIcon />}
+            sx={{
+              background: 'none',
+              border: 'none',
+              boxShadow: 'none',
+              padding: 0,
+              textTransform: 'capitalize',
+              minWidth: 0,
+              '&:hover': {
+                background: 'transparent',
+              },
+            }}
+            onClick={handleBack}
+          >
+            Back
+          </Button>
+          <Button
+            variant="contained"
+            color="primary"
+            disabled={!selectedAnswer}
+            onClick={handleNext}
+            sx={{ borderRadius: 3, px: 4, textTransform: 'capitalize' }}
+          >
+            {isLastQuestion ? 'Finish' : 'Next'}
+          </Button>
+        </Box>
     </Paper>
   );
 }

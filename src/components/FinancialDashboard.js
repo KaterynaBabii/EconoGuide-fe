@@ -71,7 +71,6 @@ function FinancialDashboard({ results }) {
           </ToggleButton>
         </ToggleButtonGroup>
     </Paper>
-      {/* Main Content */}
       <Box sx={{ flex: 1 }}>
         {view === 'recommendation' ? (
           <RecommendationView results={results} />

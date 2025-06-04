@@ -19,7 +19,7 @@ const theme = createTheme({
 });
 
 function App() {
-  const [currentStep, setCurrentStep] = useState('intro'); // intro, quiz, results
+  const [currentStep, setCurrentStep] = useState('intro');
   const [quizResults, setQuizResults] = useState(null);
 
   const handleStartQuiz = () => {
