@@ -3,7 +3,6 @@ import {
   Typography,
   Paper,
   Box,
-  LinearProgress,
   Button,
   useTheme,
   useMediaQuery,

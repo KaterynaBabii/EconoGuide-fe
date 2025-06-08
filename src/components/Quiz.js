@@ -13,7 +13,6 @@ import Loading from './Loading';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import CloseIcon from '@mui/icons-material/Close';
 
-import ScoreChart from './ScoreChart';
 import { fetchQuizQuestions, submitQuizAnswers } from '../services/api.js';
 
 
@@ -25,7 +24,6 @@ function Quiz({ onComplete, onRestart }) {
   const [resultLoading, setResultLoading] = useState(false);
   const [selectedAnswer, setSelectedAnswer] = useState('');
   const [error, setError] = useState(null);
-  const [quizResults, setQuizResults] = useState(null);
 
   useEffect(() => {
     loadQuestions();
@@ -76,7 +74,6 @@ function Quiz({ onComplete, onRestart }) {
     setResultLoading(true);
     try {
       const results = await submitQuizAnswers(finalAnswers);
-      setQuizResults(results);
       onComplete(results);
     } catch (error) {
       console.error('Error submitting quiz:', error);
@@ -109,32 +106,6 @@ function Quiz({ onComplete, onRestart }) {
     );
   }
 
-  // if (quizResults) {
-  //   return (
-  //     <Paper elevation={3} sx={{ p: 4 }}>
-  //       <Typography variant="h4" gutterBottom align="center">
-  //         Quiz Results
-  //       </Typography>
-  //       <Box sx={{ my: 4 }}>
-  //         <ScoreChart 
-  //           score={quizResults.score || 0} 
-  //           totalPossible={questions.length} 
-  //         />
-  //       </Box>
-  //       <Box sx={{ mt: 4, display: 'flex', justifyContent: 'center' }}>
-  //         <Button
-  //           variant="contained"
-  //           color="primary"
-  //           onClick={onRestart}
-  //         >
-  //           Take Quiz Again
-  //         </Button>
-  //       </Box>
-  //     </Paper>
-  //   );
-  // }
-
-
   if (!questions.length || !questions[currentQuestion]) {
     return (
       <Box sx={{ p: 4, textAlign: 'center' }}>
@@ -160,6 +131,7 @@ function Quiz({ onComplete, onRestart }) {
             variant="buffer"
             value={(currentQuestion / questions.length) * 100}
             sx={{ height: 10, borderRadius: 5 }}
+            valueBuffer={100}
           />
         </Box>
         <CloseIcon onClick={onRestart} />

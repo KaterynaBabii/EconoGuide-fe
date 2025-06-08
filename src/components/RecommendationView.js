@@ -14,12 +14,10 @@ import {
   useMediaQuery,
 } from '@mui/material';
 import {
-  SavingsOutlined as PiggyBankIcon,
   AssignmentOutlined as ClipboardIcon,
   TrackChangesOutlined as TargetIcon,
   MenuOutlined as MenuIcon,
 } from '@mui/icons-material';
-
 
 function RecommendationView({ results }) {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -131,7 +129,9 @@ function RecommendationView({ results }) {
       {isMobile && renderSidebar()}
       <Box sx={{ flex: 1, width: '100%' }}>
         {results.targeted_recommendations.map((recommendation) => {
-          const categoryId = recommendation.area.toLowerCase().replace(/\s+/g, '-');
+            const categoryId = recommendation.area.toLowerCase().replace(/\s+/g, '-');
+            const base64Svg = btoa(recommendation?.area_label?.value);
+            const dataUrl = `data:image/svg+xml;base64,${base64Svg}`;
 
           return (
             <Box
@@ -142,8 +142,8 @@ function RecommendationView({ results }) {
             >
               <Paper  elevation={0} sx={{ p: 3, mb: 3, backdropFilter: 'blur(10px)', boxShadow: '0px 0px 10px 5px rgba(0, 0, 0, 0.2)' }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
-                    <PiggyBankIcon sx={{ fontSize: 32, mr: 2, color: 'primary.main' }} />
-                    <Typography variant="h5" component="h2">
+                    <img src={dataUrl} alt="icon" width={24} height={24} />
+                    <Typography variant="h5" component="h2" pl={2}>
                     {recommendation.area}
                     </Typography>
                 </Box>
@@ -190,12 +190,12 @@ function RecommendationView({ results }) {
                 <Typography variant="h6" gutterBottom>
                   Helpful Resources
                 </Typography>
-                <List>
+                  <List sx={{ display: 'flex'}}>
                   {recommendation.improvement_plan.resources.map((resource, idx) => (
-                    <ListItem key={`${categoryId}-resource-${idx}`}>
-                      <Link href={resource.includes('http') ? resource : `https://${resource}`} target="_blank" rel="noopener">
-                        {resource}
-                      </Link>
+                      <ListItem sx={{ width: 'auto' }} key={`${categoryId}-resource-${idx}`}>
+                          <Link href={ resource?.url} target="_blank" rel="noopener">
+                            {resource?.title}
+                          </Link>
                     </ListItem>
                   ))}
                 </List>
