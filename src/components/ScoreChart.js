@@ -3,7 +3,6 @@ import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
 import { Box, Typography } from '@mui/material';
 
 function ScoreChart({ score, totalPossible }) {
-  console.log(score, totalPossible)
   const percentage = (score / totalPossible) * 100;
   
   const data = [

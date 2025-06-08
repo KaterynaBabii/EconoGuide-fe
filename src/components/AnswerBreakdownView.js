@@ -24,21 +24,21 @@ function AnswerBreakdownView({ results }) {
       </Box>
       <Divider color="black" pb={2}/>
        {results.question_scores.map((score) => (
-                <Box display="flex" alignItems="start" pt={2} key={score.question_id}>
-                    <Box flex={1} p={1}>
+           <Box display="flex" alignItems="start" pt={2} key={score.question_id}>
+                <Box flex={1} p={1}>
                     <Typography fontSize={18}>{score.question_id}: {score.question}</Typography>
-                    </Box>
-                    <Box flex={1} p={1}>
+                </Box>
+                <Box flex={1} p={1}>
                     {score.selected_answer}
-                    </Box>
-                    <Box flex={1} p={1}>
-                        <Typography color={score.score < 50 ? "error.main" : "success.main"}>
+                </Box>
+                <Box flex={1} p={1}>
+                    <Typography color={score.score < 50 ? "error.main" : "success.main"}>
                         {score.score}/100
-                        </Typography>
-                        <Typography >
+                    </Typography>
+                    <Typography >
                         {score.explanation}
-                        </Typography>
-                    </Box>
+                    </Typography>
+                </Box>
             </Box>
               ))}
     </Box>
